@@ -1,23 +1,31 @@
-import { response } from "../helper/response.js"
+import {response} from "../helper/response.js"
 
-export function GetTodos(req, res, next) {
-    return response(res, 200, 'ok', `${req.method}, todos`)
-}
+const TodoController = (TodoService) => ({
+    FindAll: async (req, res) => {
+        try {
+            const result = await TodoService.FindAll()
+            return response(res, 200, 'OK', result)
+        } catch (e) {
+            return response(res, 500, 'Error', e.message)
+        }
+    },
 
-export function GetTodo(req, res, next) {
-    return response(res, 200, 'ok', `${req.params.id}, get`)
-}
+    FindOne: (req, res) => {
+        return response(res, 200, 'ok', `${req.params.id}, get`)
+    },
 
-export function PostTodo(req, res, next) {
-    return response(res, 201, 'created', req.body)
-}
+    Create: (req, res) => {
+        return response(res, 201, 'created', req.body)
+    },
 
-export function UpdateTodo(req, res, next) {
-    return response(res, 201, 'updated', `${req.params.id}, update`)
+    Update: (req, res) => {
+        return response(res, 201, 'updated', `${req.params.id}, update`)
 
-}
+    },
 
-export function DeleteTodo(req, res, next) {
-    return response(res, 201, 'deleted', `${req.params.id}, delete`)
-}
+    Delete: (req, res) => {
+        return response(res, 201, 'deleted', `${req.params.id}, delete`)
+    }
 
+})
+export default TodoController
