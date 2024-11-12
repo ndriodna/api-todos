@@ -20,3 +20,4 @@ export function UpdateTodo(req, res, next) {
 export function DeleteTodo(req, res, next) {
     return response(res, 201, 'deleted', `${req.params.id}, delete`)
 }
+
