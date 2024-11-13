@@ -1,4 +1,4 @@
-import {response} from "../helper/response.js"
+import { response } from "../helper/response.js"
 
 const TodoController = (TodoService) => ({
     FindAll: async (req, res) => {
@@ -15,7 +15,7 @@ const TodoController = (TodoService) => ({
             const result = await TodoService.FindOne(req.params.id)
             return response(res, 200, 'Ok', result)
         } catch (e) {
-            return response(res, 404, 'Error', e.message)
+            return response(res, e.code, e.status, e.message)
         }
     },
 
@@ -24,7 +24,7 @@ const TodoController = (TodoService) => ({
             const result = await TodoService.Create(req.body)
             return response(res, 201, 'created', result)
         } catch (e) {
-            return response(res, 500, 'Error', e.message)
+            return response(res, e.code, e.status, e.message)
         }
     },
 
@@ -34,7 +34,7 @@ const TodoController = (TodoService) => ({
             console.log(result)
             return response(res, 201, 'updated', result)
         } catch (e) {
-            return response(res, 500, 'Error', e.message)
+            return response(res, e.code, e.status, e.message)
         }
     },
 
@@ -43,7 +43,7 @@ const TodoController = (TodoService) => ({
             await TodoService.Delete(req.params.id)
             return response(res, 201, 'deleted', `success delete`)
         } catch (e) {
-            return response(res, 404, 'Error', e.message)
+            return response(res, e.code, e.status, e.message)
         }
     }
 

@@ -2,37 +2,37 @@ const TodoRepository = (db) => ({
 
     FindAll: async () => {
         try {
-            const q = await db.query('select * from todo')
-            return q.rows
+            const result = await db.query('select * from todo')
+            return result.rows
         } catch (e) {
-            throw new Error(e.message)
+            throw e
         }
     },
 
     FindOne: async (id) => {
         try {
             const find = await db.query('select * from todo where id = $1', [id])
-            return find.rows
+            return find.rows[0]
         } catch (e) {
-            throw new Error(e.message)
+            throw e
         }
     },
 
     Create: async (todo) => {
         try {
-            const result = await db.query('insert into todo(id, name, status, date) values(DEFAULT, $1, $2, $3)', [todo.name, todo.status, todo.date])
+            const result = await db.query('insert into todo(id, name, status, date) values(DEFAULT, $1, $2, $3) returning *', [todo.name, todo.status, todo.date])
             return result.rows[0]
         } catch (e) {
-            throw new Error(e.message)
+            throw e
         }
     },
 
     Update: async (id, todo) => {
         try {
-            const result = await db.query('update todo set name = $2, status = $3, date = $4 where id = $1', [id, todo.name, todo.status, todo.date])
+            const result = await db.query('update todo set name = $2, status = $3, date = $4 where id = $1 returning *', [id, todo.name, todo.status, todo.date])
             return result.rows[0]
         } catch (e) {
-            throw new Error(e.message)
+            throw e
         }
     },
 
@@ -40,7 +40,7 @@ const TodoRepository = (db) => ({
         try {
             await db.query('delete from todo where id = $1', [id])
         } catch (e) {
-            throw new Error(e.message)
+            throw e
         }
     }
 })
