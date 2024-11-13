@@ -1,27 +1,46 @@
 const TodoService = (TodoRepository) => ({
     FindAll: async () => {
         try {
-            const result = await TodoRepository.FindAll()
-            return result
+            return await TodoRepository.FindAll()
         } catch (e) {
             throw new Error(e.message)
         }
     },
 
-    FindOne: (id) => {
-
+    FindOne: async (id) => {
+        try {
+            const find = await TodoRepository.FindOne(id)
+            if (find.length > 0) return find
+            throw new Error('data not found')
+        } catch (e) {
+            throw new Error(e.message)
+        }
     },
 
-    Create: () => {
-
+    Create: async (todo) => {
+        try {
+            return await TodoRepository.Create(todo)
+        } catch (e) {
+            throw new Error(e.message)
+        }
     },
 
-    Update: (id) => {
-
+    Update: async (id, todo) => {
+        try {
+            const find = await TodoRepository.FindOne(id)
+            if (find.length < 1) throw new Error('data not found')
+            return await TodoRepository.Update(find.id, todo)
+        } catch (e) {
+            throw new Error(e.message)
+        }
     },
 
-    Delete: (id) => {
-
+    Delete: async (id) => {
+        try {
+            return await TodoRepository.Delete(id)
+        } catch (e) {
+            throw new Error(e.message)
+        }
     }
 })
 

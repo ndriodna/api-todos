@@ -6,9 +6,9 @@ const router = express.Router()
 const TodoController = todoContainer.TodoController
 
 router.get('/', TodoController.FindAll)
-// router.get('/:id', GetTodo)
-// router.post('/create', PostTodo)
-// router.patch('/update/:id', UpdateTodo)
-// router.delete('/remove/:id', DeleteTodo)
+router.get('/:id', TodoController.FindOne)
+router.post('/create', TodoController.Create)
+router.put('/update/:id', TodoController.Update)
+router.delete('/remove/:id', TodoController.Delete)
 
 export default router 

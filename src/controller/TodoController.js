@@ -10,21 +10,41 @@ const TodoController = (TodoService) => ({
         }
     },
 
-    FindOne: (req, res) => {
-        return response(res, 200, 'ok', `${req.params.id}, get`)
+    FindOne: async (req, res) => {
+        try {
+            const result = await TodoService.FindOne(req.params.id)
+            return response(res, 200, 'Ok', result)
+        } catch (e) {
+            return response(res, 404, 'Error', e.message)
+        }
     },
 
-    Create: (req, res) => {
-        return response(res, 201, 'created', req.body)
+    Create: async (req, res) => {
+        try {
+            const result = await TodoService.Create(req.body)
+            return response(res, 201, 'created', result)
+        } catch (e) {
+            return response(res, 500, 'Error', e.message)
+        }
     },
 
-    Update: (req, res) => {
-        return response(res, 201, 'updated', `${req.params.id}, update`)
-
+    Update: async (req, res) => {
+        try {
+            const result = await TodoService.Update(req.params.id, req.body)
+            console.log(result)
+            return response(res, 201, 'updated', result)
+        } catch (e) {
+            return response(res, 500, 'Error', e.message)
+        }
     },
 
-    Delete: (req, res) => {
-        return response(res, 201, 'deleted', `${req.params.id}, delete`)
+    Delete: async (req, res) => {
+        try {
+            await TodoService.Delete(req.params.id)
+            return response(res, 201, 'deleted', `success delete`)
+        } catch (e) {
+            return response(res, 404, 'Error', e.message)
+        }
     }
 
 })
