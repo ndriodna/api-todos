@@ -31,7 +31,6 @@ const TodoController = (TodoService) => ({
     Update: async (req, res) => {
         try {
             const result = await TodoService.Update(req.params.id, req.body)
-            console.log(result)
             return response(res, 201, 'updated', result)
         } catch (e) {
             return response(res, e.code, e.status, e.message)

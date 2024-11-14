@@ -1,4 +1,5 @@
 import { InternalServerError, NotFoundError } from "../exception/error.js"
+import { sanitize } from "../helper/regex.js"
 
 const TodoService = (TodoRepository) => ({
     FindAll: async () => {
@@ -24,9 +25,9 @@ const TodoService = (TodoRepository) => ({
 
     Create: async (todo) => {
         try {
-            if (todo.date == null) {
-                todo.date = new Date().toISOString()
-            }
+            todo.name = sanitize(todo.name)
+            todo.status = sanitize(todo.status)
+            todo.date = new Date().toISOString()
             return await TodoRepository.Create(todo)
         } catch (e) {
             throw InternalServerError(e.message)
@@ -35,11 +36,13 @@ const TodoService = (TodoRepository) => ({
 
     Update: async (id, todo) => {
         try {
+            todo.name = sanitize(todo.name)
+            todo.status = sanitize(todo.status)
             const find = await TodoRepository.FindOne(id)
             if (!find) throw NotFoundError()
             todo.name ? todo.name : todo.name = find.name
             todo.status ? todo.status : todo.status = find.status
-            todo.date ? todo.date : todo.date = find.date
+            todo.date = find.date
             const result = await TodoRepository.Update(find.id, todo)
             return result
         } catch (e) {
