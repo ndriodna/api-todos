@@ -3,5 +3,11 @@ export function sanitize(input) {
 }
 
 export function isEmail(input) {
-    return input.test(/^[\w-\.]+@([\w-]+\.)+[\w]{2,}/g)
+    const regex = /^[\w-\.]+@([\w-]+\.)+[\w]{2,}/g
+    return regex.test(input)
+}
+
+export function isId(input) {
+    const regex = /^\d+$/g
+    return regex.test(input)
 }
