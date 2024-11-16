@@ -1,5 +1,6 @@
 import { BadRequestError, InternalServerError, NotFoundError } from "../exception/error.js"
-import { isId, sanitize } from "../helper/regex.js"
+import { CreateSchema, UpadteSchema, FindSchema } from "../validator/UserSchema.js"
+import { check, validate } from "../validator/Validator.js"
 
 const TodoService = (TodoRepository) => ({
     FindAll: async () => {
@@ -7,23 +8,25 @@ const TodoService = (TodoRepository) => ({
     },
 
     FindOne: async (id) => {
-        if (!isId(id)) throw BadRequestError('ID must be number')
+        const isValid = validate({ id: id }, FindSchema)
+        check(isValid)
         const find = await TodoRepository.FindOne(id)
         if (!find) throw NotFoundError()
         return find
     },
 
     Create: async (todo) => {
-        todo.name = sanitize(todo.name)
-        todo.status = sanitize(todo.status)
+        console.log('ini status', todo)
+        const isValid = validate(todo, CreateSchema)
+        check(isValid)
         todo.date = new Date().toISOString()
-        return await TodoRepository.Create(todo)
+        // return await TodoRepository.Create(todo)
     },
 
     Update: async (id, todo) => {
-        if (!isId(id)) throw BadRequestError('ID must be number')
-        todo.name = sanitize(todo.name)
-        todo.status = sanitize(todo.status)
+        todo.id = id
+        const isValid = validate(todo, UpadteSchema)
+        check(isValid)
         const find = await TodoRepository.FindOne(id)
         if (!find) throw NotFoundError()
         todo.name ? todo.name : todo.name = find.name
@@ -34,7 +37,8 @@ const TodoService = (TodoRepository) => ({
     },
 
     Delete: async (id) => {
-        if (!isId(id)) throw BadRequestError('ID must be number')
+        const isValid = validate({ id: id }, FindSchema)
+        check(isValid)
         const find = await TodoRepository.FindOne(id)
         if (!find) throw NotFoundError()
         return await TodoRepository.Delete(id)

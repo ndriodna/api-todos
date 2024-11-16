@@ -1,4 +1,5 @@
-import { response } from "../helper/response.js"
+import { response } from "../utils/response.js"
+import Atoi from "../utils/strconv.js"
 
 const TodoController = (TodoService) => ({
     FindAll: async (req, res, next) => {
@@ -12,7 +13,8 @@ const TodoController = (TodoService) => ({
 
     FindOne: async (req, res, next) => {
         try {
-            const result = await TodoService.FindOne(req.params.id)
+            const id = Atoi(req)
+            const result = await TodoService.FindOne(id)
             return response(res, 200, 'Ok', result)
         } catch (err) {
             next(err)
@@ -30,7 +32,8 @@ const TodoController = (TodoService) => ({
 
     Update: async (req, res, next) => {
         try {
-            const result = await TodoService.Update(req.params.id, req.body)
+            const id = Atoi(req)
+            const result = await TodoService.Update(id, req.body)
             return response(res, 201, 'updated', result)
         } catch (err) {
             next(err)
@@ -39,7 +42,8 @@ const TodoController = (TodoService) => ({
 
     Delete: async (req, res, next) => {
         try {
-            await TodoService.Delete(req.params.id)
+            const id = Atoi(req)
+            await TodoService.Delete(id)
             return response(res, 201, 'deleted', `success delete`)
         } catch (err) {
             next(err)
