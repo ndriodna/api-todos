@@ -1,4 +1,4 @@
-import { BadRequestError, InternalServerError, NotFoundError } from "../exception/error.js"
+import { NotFoundError } from "../exception/error.js"
 import { CreateSchema, UpadteSchema, FindSchema } from "../validator/UserSchema.js"
 import { check, validate } from "../validator/Validator.js"
 
@@ -16,11 +16,10 @@ const TodoService = (TodoRepository) => ({
     },
 
     Create: async (todo) => {
-        console.log('ini status', todo)
         const isValid = validate(todo, CreateSchema)
         check(isValid)
         todo.date = new Date().toISOString()
-        // return await TodoRepository.Create(todo)
+        return await TodoRepository.Create(todo)
     },
 
     Update: async (id, todo) => {
