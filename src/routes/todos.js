@@ -1,9 +1,6 @@
-import todoContainer from "../container/TodoContainer.js";
+import { TodoController } from "../container/TodoContainer.js";
 
 export default function TodoRoute(router) {
-
-    const TodoController = todoContainer.TodoController
-
     router.get('/', TodoController.FindAll)
     router.get('/:id', TodoController.FindOne)
     router.post('/create', TodoController.Create)

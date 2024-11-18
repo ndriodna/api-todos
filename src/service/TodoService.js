@@ -1,5 +1,5 @@
 import { NotFoundError } from "../exception/error.js"
-import { CreateSchema, UpadteSchema, FindSchema } from "../validator/UserSchema.js"
+import { CreateSchema, UpadteSchema, FindSchema } from "../validator/TodoSchema.js"
 import { check, validate } from "../validator/Validator.js"
 
 const TodoService = (TodoRepository) => ({
