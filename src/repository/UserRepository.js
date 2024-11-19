@@ -3,7 +3,8 @@ import { InternalServerError } from "../exception/error"
 const UserRepository = (db) => ({
     FindAll: async () => {
         try {
-            const result = await db.query('select * from users')
+            const q = 'select * from users u join user_details ud on u.id = ud.user_id'
+            const result = await db.query(q)
             return result.rows
         } catch (error) {
             throw InternalServerError(error.message)
@@ -11,7 +12,8 @@ const UserRepository = (db) => ({
     },
     FindOne: async (id) => {
         try {
-            const result = await db.query('select * from users where id = $1', [id])
+            const q = 'select * from users where id = $1'
+            const result = await db.query(q, [id])
             return result.rows[0]
         } catch (error) {
             throw InternalServerError(error.message)
@@ -19,7 +21,8 @@ const UserRepository = (db) => ({
     },
     Create: async (user) => {
         try {
-            const result = await db.query('insert into users(id,full_name,phone,address,user_id) values(DEFAULT,$1,$2,$3,$4) returning *', [user.full_name, user.phone, user.address, user.user_id])
+            const q = 'insert into users(full_name,phone,address,user_id) values($1,$2,$3,$4) returning *'
+            const result = await db.query(q, [user.full_name, user.phone, user.address, user.user_id])
             return result.rows[0]
         } catch (error) {
             throw InternalServerError(error.message)
@@ -27,7 +30,8 @@ const UserRepository = (db) => ({
     },
     Update: async (id, user) => {
         try {
-            const result = await db.query('update users set full_name = $2, phone = $3, address = $4 where id = $1 returning *', [id, user.full_name, user.phone, user.address])
+            const q = 'update users set full_name = $2, phone = $3, address = $4 where id = $1 returning *'
+            const result = await db.query(q, [id, user.full_name, user.phone, user.address])
             return result.rows[0]
         } catch (error) {
             throw InternalServerError(error.message)
@@ -35,7 +39,8 @@ const UserRepository = (db) => ({
     },
     Delete: async (id) => {
         try {
-            await db.query('delete from users where id = $1', [id])
+            const q = 'delete from users where id = $1'
+            await db.query(q, [id])
         } catch (error) {
             throw InternalServerError(error.message)
         }
