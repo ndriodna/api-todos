@@ -8,7 +8,14 @@ export const db = new pg.Pool({
     max: 10
 })
 
-export const query = (text, value) => {
-    return db.query(text, value);
-}
-
+export const transaction = (client) => ({
+    BEGIN: () => {
+        return client.query('BEGIN')
+    },
+    COMMIT: () => {
+        return client.query('COMMIT')
+    },
+    ROLLBACK: () => {
+        return client.query('ROLLBACK')
+    }
+})
