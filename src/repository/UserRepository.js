@@ -12,17 +12,17 @@ const UserRepository = (db) => ({
     },
     FindOne: async (id) => {
         try {
-            const q = 'select * from users where id = $1'
+            const q = 'select * from users u join user_details ud on u.id = ud.user_id where id = $1 '
             const result = await db.query(q, [id])
             return result.rows[0]
         } catch (error) {
             throw InternalServerError(error.message)
         }
     },
-    Create: async (user) => {
+    Create: async (user_id) => {
         try {
-            const q = 'insert into users(full_name,phone,address,user_id) values($1,$2,$3,$4) returning *'
-            const result = await db.query(q, [user.full_name, user.phone, user.address, user.user_id])
+            const q = 'insert into user_details(user_id) values($1) returning *'
+            const result = await db.query(q, [user_id])
             return result.rows[0]
         } catch (error) {
             throw InternalServerError(error.message)
@@ -30,7 +30,7 @@ const UserRepository = (db) => ({
     },
     Update: async (id, user) => {
         try {
-            const q = 'update users set full_name = $2, phone = $3, address = $4 where id = $1 returning *'
+            const q = 'update user_details set full_name = $2, phone = $3, address = $4 where id = $1 returning *'
             const result = await db.query(q, [id, user.full_name, user.phone, user.address])
             return result.rows[0]
         } catch (error) {

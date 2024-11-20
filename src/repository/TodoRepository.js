@@ -24,8 +24,8 @@ const TodoRepository = (db) => ({
 
     Create: async (todo) => {
         try {
-            const q = 'insert into todos(name, status, date) values(DEFAULT, $1, $2, $3) returning *'
-            const result = await db.query(q, [todo.name, todo.status, todo.date])
+            const q = 'insert into todos(name, status,user_id) values(DEFAULT, $1, $2) returning *'
+            const result = await db.query(q, [todo.name, todo.status, todo.user_id])
             return result.rows[0]
         } catch (e) {
             throw InternalServerError(e.message)
@@ -35,7 +35,7 @@ const TodoRepository = (db) => ({
     Update: async (id, todo) => {
         try {
             const q = 'update todos set name = $2, status = $3, date = $4 where id = $1 returning *'
-            const result = await db.query(q, [id, todo.name, todo.status, todo.date])
+            const result = await db.query(q, [id, todo.name, todo.status])
             return result.rows[0]
         } catch (e) {
             throw InternalServerError(e.message)

@@ -4,7 +4,8 @@ export const FindSchema = {
 
 export const CreateSchema = {
     name: { type: "string", min: 2 },
-    status: { type: "string", min: 4, default: "ON GOING" }
+    status: { type: "string", default: "ON GOING" },
+    user_id: { type: 'number' }
 }
 
 export const UpadteSchema = {

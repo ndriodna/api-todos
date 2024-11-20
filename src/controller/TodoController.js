@@ -23,6 +23,7 @@ const TodoController = (TodoService) => ({
 
     Create: async (req, res, next) => {
         try {
+            const id = Atoi(req)
             const result = await TodoService.Create(req.body)
             return response(res, 201, 'created', result)
         } catch (err) {
