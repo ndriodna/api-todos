@@ -1,7 +1,7 @@
 import pg from 'pg';
 
 
-export const db = new pg.Pool({
+export const Pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     connectionTimeoutMillis: 0,
     idleTimeoutMillis: 0,

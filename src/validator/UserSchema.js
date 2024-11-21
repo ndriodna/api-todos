@@ -1,18 +1,16 @@
-import { CreateSchema } from "./TodoSchema"
-
 export const UserFindSchema = {
     id: { type: 'number', min: 1 }
 }
 
 export const UserCraeteSchema = {
-    user_id: FindSchema.id,
+    user_id: UserFindSchema.id,
     full_name: { type: 'string', min: 3 },
     phone: { type: 'number', nullable: true },
     address: { type: 'string', nullable: true }
 }
 export const UserUpdateSchema = {
-    id: FindSchema.id,
-    CreateSchema
+    id: UserFindSchema.id,
+    UserCraeteSchema
 }
 
 export const RegisterSchema = {

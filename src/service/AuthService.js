@@ -1,27 +1,30 @@
-import { InternalServerError, UnauthorizedError } from "../exception/error"
-import { CheckPassword, GeneratePassword } from "../utils/bcrypt"
-import { RegisterSchema } from "../validator/UserSchema"
-import { check, validate } from "../validator/Validator"
-import jwt from '../utils/jwt.js';
+import { BadRequestError, InternalServerError, NotFoundError, UnauthorizedError } from "../exception/error.js"
+import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
+import { LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
+import { sign, verif } from '../utils/jwt.js';
 
-const AuthService = (db, AuthRepository, UserRepository) => ({
+const AuthService = (AuthRepository, UserRepository, db, validator) => ({
     Auth: async (token) => {
         if (!token) throw UnauthorizedError('token expired please re-login')
-        await jwt.verif(token)
+        await verif(token)
     },
     Login: async (user) => {
-        // bycrypt check
+        const isValid = validator.validate(user, LoginSchema)
+        validator.check(isValid)
         const result = await AuthRepository.FindByEmail(user.email)
+        if (!result) throw NotFoundError('email tidak ditemukan atau belum terdaftar')
         await CheckPassword(user.password, result.password)
-        const token = await jwt.sign(user)
+        const token = await sign(user)
         return token
     },
     Register: async (user) => {
-        const client = await db.connect()
+        const client = await db.Pool.connect()
         const tx = db.transaction(client)
+        const isValid = validator.validate(user, RegisterSchema)
+        validator.check(isValid)
+        const isExist = await AuthRepository.FindByEmail(user.email)
+        if (isExist == user.email) throw BadRequestError('email sudah digunakan')
         try {
-            const isValid = validate(user, RegisterSchema)
-            check(isValid)
             await tx.BEGIN()
             user.password = await GeneratePassword(user.password)
             const resultUser = await AuthRepository.Create(user)
@@ -30,7 +33,7 @@ const AuthService = (db, AuthRepository, UserRepository) => ({
             return resultUser
         } catch (error) {
             await tx.ROLLBACK()
-            throw InternalServerError(error.message)
+            throw error
         } finally {
             client.release()
         }

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { BadRequestError, UnauthorizedError } from '../exception/error'
+import { BadRequestError, UnauthorizedError } from '../exception/error.js'
 
 const secretKey = process.env.SECRET_KEY
 export function sign(payload) {

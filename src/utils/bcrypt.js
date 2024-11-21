@@ -1,5 +1,5 @@
 import bycrypt from 'bcrypt'
-import { InternalServerError, UnauthorizedError } from '../exception/error'
+import { InternalServerError, UnauthorizedError } from '../exception/error.js'
 
 const saltOrRounds = 10
 
