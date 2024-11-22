@@ -4,17 +4,13 @@ import { LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
 import { sign, verif } from '../utils/jwt.js';
 
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
-    Auth: async (token) => {
-        if (!token) throw UnauthorizedError('token expired please re-login')
-        await verif(token)
-    },
     Login: async (user) => {
         const isValid = validator.validate(user, LoginSchema)
         validator.check(isValid)
         const result = await AuthRepository.FindByEmail(user.email)
         if (!result) throw NotFoundError('email tidak ditemukan atau belum terdaftar')
         await CheckPassword(user.password, result.password)
-        const token = await sign(user)
+        const token = await sign({ id: result.id, username: result.username })
         return token
     },
     Register: async (user) => {

@@ -4,7 +4,7 @@ import Atoi from "../utils/strconv.js"
 const TodoController = (TodoService) => ({
     FindAll: async (req, res, next) => {
         try {
-            const result = await TodoService.FindAll()
+            const result = await TodoService.FindAll(req)
             return response(res, 200, 'OK', result)
         } catch (err) {
             next(err)
@@ -13,8 +13,7 @@ const TodoController = (TodoService) => ({
 
     FindOne: async (req, res, next) => {
         try {
-            const id = Atoi(req)
-            const result = await TodoService.FindOne(id)
+            const result = await TodoService.FindOne(req)
             return response(res, 200, 'Ok', result)
         } catch (err) {
             next(err)
@@ -23,8 +22,7 @@ const TodoController = (TodoService) => ({
 
     Create: async (req, res, next) => {
         try {
-            const id = Atoi(req)
-            const result = await TodoService.Create(req.body)
+            const result = await TodoService.Create(req)
             return response(res, 201, 'created', result)
         } catch (err) {
             next(err)
@@ -33,8 +31,7 @@ const TodoController = (TodoService) => ({
 
     Update: async (req, res, next) => {
         try {
-            const id = Atoi(req)
-            const result = await TodoService.Update(id, req.body)
+            const result = await TodoService.Update(req)
             return response(res, 201, 'updated', result)
         } catch (err) {
             next(err)
@@ -43,8 +40,7 @@ const TodoController = (TodoService) => ({
 
     Delete: async (req, res, next) => {
         try {
-            const id = Atoi(req)
-            await TodoService.Delete(id)
+            await TodoService.Delete(req)
             return response(res, 201, 'deleted', `success delete`)
         } catch (err) {
             next(err)

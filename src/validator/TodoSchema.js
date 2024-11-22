@@ -4,14 +4,14 @@ export const FindSchema = {
 
 export const CreateSchema = {
     name: { type: "string", min: 2 },
-    status: { type: "string", default: "ON GOING" },
-    user_id: { type: 'number' }
+    status: { type: "string", min: 2, default: "ON GOING" },
+    user_id: { type: 'number', min: 1 }
 }
 
-export const UpadteSchema = {
-    id: FindSchema.id,
-    name: CreateSchema.name,
-    status: CreateSchema.status
+export const UpdateSchema = {
+    id: { type: "number", min: 1 },
+    name: { type: "string", min: 2, optional: true },
+    status: { type: "string", min: 2, optional: true },
 }
 
 
