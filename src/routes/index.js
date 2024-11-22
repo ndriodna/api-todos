@@ -17,7 +17,7 @@ RegisterAuthRoute(router, AuthHandler)
 const UserHandler = NewUser(db, validator)
 RegisterUserRoute(router, UserHandler)
 
-const TodoHandler = NewTodo(db)
+const TodoHandler = NewTodo(db, validator)
 RegisterTodoRoute(router, TodoHandler)
 
 router.use(ErrorMiddleware)
