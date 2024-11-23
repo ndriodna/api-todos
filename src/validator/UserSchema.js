@@ -2,15 +2,10 @@ export const UserFindSchema = {
     id: { type: 'number', min: 1 }
 }
 
-export const UserCraeteSchema = {
-    user_id: UserFindSchema.id,
+export const UserUpdateSchema = {
     full_name: { type: 'string', min: 3 },
     phone: { type: 'number', nullable: true },
     address: { type: 'string', nullable: true }
-}
-export const UserUpdateSchema = {
-    id: UserFindSchema.id,
-    UserCraeteSchema
 }
 
 export const RegisterSchema = {

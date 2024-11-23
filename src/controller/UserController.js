@@ -1,5 +1,4 @@
 import { response } from "../utils/response.js"
-import Atoi from "../utils/strconv.js"
 
 const UserController = (UserService) => ({
     FindAll: async (req, res, next) => {
@@ -12,25 +11,15 @@ const UserController = (UserService) => ({
     },
     FindOne: async (req, res, next) => {
         try {
-            const id = Atoi(req)
-            const user = await UserService.FindOne(id)
+            const user = await UserService.FindOne(req)
             return response(res, 200, 'OK', user)
-        } catch (error) {
-            next(error)
-        }
-    },
-    Create: async (req, res, next) => {
-        try {
-            const created = await UserService.Create(req.body)
-            return response(res, 201, 'Created', created)
         } catch (error) {
             next(error)
         }
     },
     Update: async (req, res, next) => {
         try {
-            const id = Atoi(req.params.id)
-            const updated = await UserService.Update(id, req.body)
+            const updated = await UserService.Update(req)
             return response(res, 201, 'Updated', updated)
         } catch (error) {
             next(error)
@@ -38,8 +27,7 @@ const UserController = (UserService) => ({
     },
     Delete: async (req, res, next) => {
         try {
-            const id = Atoi(id)
-            await UserService.Delete(id)
+            await UserService.Delete(req)
             return response(res, 201, 'Deleted')
         } catch (error) {
             next(error)

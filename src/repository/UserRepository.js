@@ -3,7 +3,7 @@ import { InternalServerError } from "../exception/error.js"
 const UserRepository = (db) => ({
     FindAll: async () => {
         try {
-            const q = 'select * from users u join user_details ud on u.id = ud.user_id'
+            const q = 'select u.id,u.email,u.username,ud.full_name,ud.phone,ud.address from users u join user_details ud on u.id = ud.user_id'
             const result = await db.Pool.query(q)
             return result.rows
         } catch (error) {
@@ -12,7 +12,7 @@ const UserRepository = (db) => ({
     },
     FindOne: async (id) => {
         try {
-            const q = 'select * from users u join user_details ud on u.id = ud.user_id where u.id = $1 '
+            const q = 'select u.id,u.email,u.username,ud.full_name,ud.phone,ud.address from users u join user_details ud on u.id = ud.user_id where u.id = $1'
             const result = await db.Pool.query(q, [id])
             return result.rows[0]
         } catch (error) {
@@ -30,7 +30,7 @@ const UserRepository = (db) => ({
     },
     Update: async (id, user) => {
         try {
-            const q = 'update user_details set full_name = $2, phone = $3, address = $4 where id = $1 returning *'
+            const q = 'update user_details set full_name = $2, phone = $3, address = $4 where id = $1 returning id,full_name,phone,address'
             const result = await db.Pool.query(q, [id, user.full_name, user.phone, user.address])
             return result.rows[0]
         } catch (error) {

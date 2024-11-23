@@ -11,8 +11,7 @@ const TodoService = (TodoRepository, validator) => ({
         const user_id = todo.user.id
         const idValidate = validator.validate({ id: id }, FindSchema)
         validator.check(idValidate)
-        const user_idValidate = validator.validate({ id: user_id }, FindSchema)
-        validator.check(user_idValidate)
+
         const find = await TodoRepository.FindOneOwnUser(id, user_id)
         if (!find) throw NotFoundError()
         return find
@@ -27,22 +26,18 @@ const TodoService = (TodoRepository, validator) => ({
     },
 
     Update: async (todo) => {
-        console.log('todo body update', todo.params)
         const id = Atoi(todo)
         todo.body.id = id
 
         const isValid = validator.validate(todo.body, UpdateSchema)
         validator.check(isValid)
 
-        const find = await TodoRepository.FindOne(id)
-        console.log('ini find', find)
-        if (!find) throw NotFoundError()
-        if (find.user_id !== todo.user.id) throw UnauthorizedError(`you don't have permission to update this todo`)
+        const find = await TodoRepository.FindOneOwnUser(id, todo.user.id)
+        if (!find) throw UnauthorizedError(`you don't have permission to update this todo`)
 
         todo.body.name ? todo.body.name : todo.body.name = find.name
         todo.body.status ? todo.body.status : todo.body.status = find.status
 
-        console.log('todo body update after reasign', todo.body)
         const result = await TodoRepository.Update(find.id, todo.body)
         return result
     },
@@ -51,9 +46,10 @@ const TodoService = (TodoRepository, validator) => ({
         const id = Atoi(todo)
         const isValid = validator.validate({ id: id }, FindSchema)
         validator.check(isValid)
-        const find = await TodoRepository.FindOne(id)
-        if (!find) throw NotFoundError()
-        if (find.user_id !== todo.user.id) throw UnauthorizedError(`you don't have permission to update this todo`)
+
+        const find = await TodoRepository.FindOneOwnUser(id, todo.user.id)
+        if (!find) throw UnauthorizedError(`you don't have permission to delete this todo`)
+
         return await TodoRepository.Delete(id)
     }
 })

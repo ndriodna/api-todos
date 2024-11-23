@@ -4,7 +4,7 @@ const TodoRepository = (db) => ({
 
     FindAll: async () => {
         try {
-            const q = 'select * from todos t join users u on u.id = t.user_id'
+            const q = 'select t.*,u.email,u.username from todos t join users u on u.id = t.user_id'
             const result = await db.Pool.query(q)
             return result.rows
         } catch (error) {
