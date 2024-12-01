@@ -4,6 +4,9 @@ import { LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
 import { sign, verif } from '../utils/jwt.js';
 
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
+    Auth: async (user) => {
+        return user.token
+    },
     Login: async (user) => {
         const isValid = validator.validate(user, LoginSchema)
         validator.check(isValid)
