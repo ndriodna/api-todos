@@ -1,10 +1,9 @@
-import { response } from "../utils/response.js"
+import { resClearCookie, resCookie, response } from "../utils/response.js"
 
 const AuthController = (AuthService) => ({
     Auth: async (req, res, next) => {
         try {
-            const token = req.body.token
-            const result = await AuthService.Auth(token)
+            const result = await AuthService.Auth(req, res)
             return response(res, 200, 'OK', result)
         } catch (error) {
             next(error)
@@ -13,6 +12,7 @@ const AuthController = (AuthService) => ({
     Login: async (req, res, next) => {
         try {
             const result = await AuthService.Login(req.body)
+            resCookie(res, result)
             return response(res, 200, 'OK', result)
         } catch (error) {
             next(error)
@@ -33,5 +33,12 @@ const AuthController = (AuthService) => ({
             next(error)
         }
     },
+    Logout: async (req, res, next) => {
+        try {
+            resClearCookie(res, req.token)
+        } catch (error) {
+            next(error)
+        }
+    }
 })
 export default AuthController
