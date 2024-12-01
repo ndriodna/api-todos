@@ -7,7 +7,7 @@ const TodoService = (TodoRepository, validator) => ({
         return await TodoRepository.FindAllOwnUser(todo.user.id)
     },
     FindOne: async (todo) => {
-        const id = Atoi(todo)
+        const id = Atoi(todo.params.id)
         const user_id = todo.user.id
         const idValidate = validator.validate({ id: id }, FindSchema)
         validator.check(idValidate)
@@ -26,7 +26,7 @@ const TodoService = (TodoRepository, validator) => ({
     },
 
     Update: async (todo) => {
-        const id = Atoi(todo)
+        const id = Atoi(todo.params.id)
         todo.body.id = id
 
         const isValid = validator.validate(todo.body, UpdateSchema)
@@ -43,7 +43,7 @@ const TodoService = (TodoRepository, validator) => ({
     },
 
     Delete: async (todo) => {
-        const id = Atoi(todo)
+        const id = Atoi(todo.params.id)
         const isValid = validator.validate({ id: id }, FindSchema)
         validator.check(isValid)
 
