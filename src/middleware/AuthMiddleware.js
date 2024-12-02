@@ -12,7 +12,7 @@ export default async function AuthMiddleware(req, res, next) {
         req.user = decoded
         next()
     } catch (error) {
-        resClearCookie(res, token)
+        resClearCookie(res, req.token)
         next(error)
     }
 }
