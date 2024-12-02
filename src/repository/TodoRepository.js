@@ -14,7 +14,7 @@ const TodoRepository = (db) => ({
 
     FindAllOwnUser: async (id) => {
         try {
-            const q = 'select * from todos where user_id = $1'
+            const q = 'select * from todos where user_id = $1 order by created_at desc, id asc'
             const result = await db.Pool.query(q, [id])
             return result.rows
         } catch (error) {
