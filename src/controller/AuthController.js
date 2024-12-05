@@ -35,7 +35,8 @@ const AuthController = (AuthService) => ({
     },
     Logout: async (req, res, next) => {
         try {
-            resClearCookie(res, req.token)
+            const result = AuthService.Logout(req, res)
+            return response(res, 200, 'OK', result)
         } catch (error) {
             next(error)
         }

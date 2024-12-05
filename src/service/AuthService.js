@@ -1,7 +1,8 @@
 import { BadRequestError, InternalServerError, NotFoundError, UnauthorizedError } from "../exception/error.js"
 import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
 import { LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
-import { sign, verif } from '../utils/jwt.js';
+import { sign } from '../utils/jwt.js';
+import { resClearCookie } from "../utils/response.js";
 
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
     Auth: async (user) => {
@@ -36,6 +37,11 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         } finally {
             client.release()
         }
+    },
+
+    Logout: (req, res) => {
+        resClearCookie(res, req.token)
+        return 'logout success'
     }
 })
 

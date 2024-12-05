@@ -4,4 +4,5 @@ export default function RegisterAuthRoute(router, handler) {
     router.get('/auth', AuthMiddleware, handler.Auth)
     router.post('/auth/login', handler.Login)
     router.post('/auth/register', handler.Register)
+    router.post('/auth/logout', handler.Logout)
 }
