@@ -28,7 +28,8 @@ const AuthController = (AuthService) => ({
     },
     ForgotPassword: async (req, res, next) => {
         try {
-
+            const result = await AuthService.ForgotPassword(req, res)
+            return response(res, 200, 'OK', result)
         } catch (error) {
             next(error)
         }

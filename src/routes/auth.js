@@ -5,4 +5,5 @@ export default function RegisterAuthRoute(router, handler) {
     router.post('/auth/login', handler.Login)
     router.post('/auth/register', handler.Register)
     router.post('/auth/logout', handler.Logout)
+    router.post('/auth/forgot', handler.ForgotPassword)
 }

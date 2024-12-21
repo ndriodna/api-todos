@@ -20,6 +20,7 @@
     "express": "^4.21.1",
     "fastest-validator": "^1.19.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.16",
     "pg": "^8.13.1"
   },
   "devDependencies": {

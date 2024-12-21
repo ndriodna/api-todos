@@ -3,6 +3,7 @@ import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
 import { LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
 import { sign } from '../utils/jwt.js';
 import { resClearCookie } from "../utils/response.js";
+import emailEvent from "../event/email.js";
 
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
     Auth: async (user) => {
@@ -38,10 +39,19 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
             client.release()
         }
     },
-
     Logout: (req, res) => {
         resClearCookie(res, req.token)
         return 'logout success'
+    },
+    ForgotPassword: async (req, res) => {
+        const data = {
+            to: 'effoc404@gmail.com',
+            subject: 'forgot password verification',
+            text: 'click this link',
+            html: `<b>this link</b> and this email user ${req.body.email}`
+        }
+        emailEvent.emit('forgotPasswordMail', data)
+        return 'sending mail please check your email'
     }
 })
 
