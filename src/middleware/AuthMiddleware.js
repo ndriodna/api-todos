@@ -4,10 +4,9 @@ import { resClearCookie } from "../utils/response.js"
 
 export default async function AuthMiddleware(req, res, next) {
     try {
-        const tokenHeader = req.get('cookie')
+        const tokenHeader = req.cookies.Authorization
         if (!tokenHeader) throw UnauthorizedError('token not found please re-login')
-        if (!tokenHeader.startsWith('Authorization')) throw UnauthorizedError('format token invalid')
-        req.token = tokenHeader.split('=')[1]
+        req.token = tokenHeader
         const decoded = await verif(req.token)
         req.user = decoded
         next()
