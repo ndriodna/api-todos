@@ -1,9 +1,10 @@
-import { BadRequestError, InternalServerError, NotFoundError, UnauthorizedError } from "../exception/error.js"
+import { BadRequestError, NotFoundError } from "../exception/error.js"
 import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
-import { LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
+import { ForgotPasswordSchema, LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
 import { sign } from '../utils/jwt.js';
 import { resClearCookie } from "../utils/response.js";
-import emailEvent from "../event/email.js";
+import { SendEmailResetPassword } from '../utils/email.js';
+import generateOTP from "../utils/otp.js";
 
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
     Auth: async (user) => {
@@ -43,15 +44,20 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         resClearCookie(res, req.token)
         return 'logout success'
     },
-    ForgotPassword: async (req, res) => {
-        const data = {
-            to: 'effoc404@gmail.com',
-            subject: 'forgot password verification',
-            text: 'click this link',
-            html: `<b>this link</b> and this email user ${req.body.email}`
-        }
-        emailEvent.emit('forgotPasswordMail', data)
-        return 'sending mail please check your email'
+    ForgotPassword: async (user) => {
+        const isValid = validator.validate(user, ForgotPasswordSchema)
+        validator.check(isValid)
+
+        const FindByEmail = await AuthRepository.FindByEmail(user.email)
+        if (!FindByEmail) throw NotFoundError()
+
+        user.user_id = FindByEmail.id
+        user.otp_code = generateOTP()
+
+        const resultCreateOTP = await AuthRepository.CreateOTP(user)
+
+        await SendEmailResetPassword(user.email, resultCreateOTP.otp_code)
+        return 'please check your email'
     }
 })
 
