@@ -31,7 +31,7 @@ export const AuthRepository = (db) => ({
     Update: async (user) => {
         try {
             const qUser = 'update users set password = $2 where id = $1'
-            await db.Pool.query(qUser, [user])
+            await db.Pool.query(qUser, [user.id, user.password])
         } catch (error) {
             throw InternalServerError(error)
         }
@@ -44,19 +44,27 @@ export const AuthRepository = (db) => ({
             throw InternalServerError(error)
         }
     },
-    CreateOTP: async (otp) => {
+    FindOTP: async (user_id) => {
+        try {
+            const qUser = 'select * from otp join users u on otp.user_id = u.id where u.id = $1'
+            await db.Pool.query(qUser, user_id)
+        } catch (error) {
+            throw InternalServerError(error)
+        }
+    },
+    CreateOTP: async (user) => {
         try {
             const qUser = 'insert into otp(user_id,otp_code) values($1,$2) returning user_id, otp_code'
-            const result = await db.Pool.query(qUser, [otp.user_id, otp.otp_code])
+            const result = await db.Pool.query(qUser, [user.user_id, user.otp_code])
             return { user_id: result.rows[0].user_id, otp_code: result.rows[0].otp_code }
         } catch (error) {
             throw InternalServerError(error)
         }
     },
-    DeleteOTP: async (otp) => {
+    DeleteOTP: async (user) => {
         try {
             const qUser = 'delete from otp where id = $1'
-            await db.Pool.query(qUser, otp)
+            await db.Pool.query(qUser, user)
         } catch (error) {
             throw InternalServerError(error)
         }

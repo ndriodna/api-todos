@@ -1,6 +1,6 @@
 import { BadRequestError, NotFoundError } from "../exception/error.js"
 import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
-import { ForgotPasswordSchema, LoginSchema, RegisterSchema } from "../validator/UserSchema.js"
+import { LoginSchema, OTPSchema, RegisterSchema, UserFindByEmaildSchema } from "../validator/UserSchema.js"
 import { sign } from '../utils/jwt.js';
 import { resClearCookie } from "../utils/response.js";
 import { SendEmailResetPassword } from '../utils/email.js';
@@ -44,8 +44,8 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         resClearCookie(res, req.token)
         return 'logout success'
     },
-    ForgotPassword: async (user) => {
-        const isValid = validator.validate(user, ForgotPasswordSchema)
+    SendOTP: async (user) => {
+        const isValid = validator.validate(user, UserFindByEmaildSchema)
         validator.check(isValid)
 
         const FindByEmail = await AuthRepository.FindByEmail(user.email)
@@ -58,6 +58,27 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
 
         await SendEmailResetPassword(user.email, resultCreateOTP.otp_code)
         return 'please check your email'
+    },
+    ForgotPassword: async (user) => {
+        const isValid = validator.validate(user, OTPSchema)
+        validator.check(isValid)
+
+        const FindByEmail = await AuthRepository.FindByEmail(user.email)
+        if (!FindByEmail) throw NotFoundError()
+
+        const FindOTP = await AuthRepository.FindOTP(FindByEmail.id)
+        if (!FindOTP) throw NotFoundError()
+
+        const currentD = Date.now()
+        const otpDate = Date.parse(FindOTP.created_at)
+        const differtime = currentD - otpDate
+        if (differtime > (3600 * 1000)) {
+            await AuthRepository.DeleteOTP(FindOTP.id)
+            throw BadRequestError('otp expired')
+        }
+        user.password = await GeneratePassword(user.password)
+        await AuthRepository.Update({ id: FindByEmail.id, password: user.password })
+        return 'password updated'
     }
 })
 
