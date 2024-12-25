@@ -41,6 +41,14 @@ const AuthController = (AuthService) => ({
         } catch (error) {
             next(error)
         }
+    },
+    SendOTP: async (req, res, next) => {
+        try {
+            const result = await AuthService.SendOTP(req.body)
+            return response(res, 200, 'OK', result)
+        } catch (error) {
+            next(error)
+        }
     }
 })
 export default AuthController

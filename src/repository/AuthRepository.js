@@ -30,7 +30,7 @@ export const AuthRepository = (db) => ({
     },
     Update: async (user) => {
         try {
-            const qUser = 'update users set password = $2 where id = $1'
+            const qUser = 'update users set password = $2, updated_at = now() where id = $1'
             await db.Pool.query(qUser, [user.id, user.password])
         } catch (error) {
             throw InternalServerError(error)
@@ -46,8 +46,9 @@ export const AuthRepository = (db) => ({
     },
     FindOTP: async (user_id) => {
         try {
-            const qUser = 'select * from otp join users u on otp.user_id = u.id where u.id = $1'
-            await db.Pool.query(qUser, user_id)
+            const qUser = 'select * from otp where user_id = $1'
+            const result = await db.Pool.query(qUser, [user_id])
+            return result.rows[0]
         } catch (error) {
             throw InternalServerError(error)
         }
@@ -64,7 +65,7 @@ export const AuthRepository = (db) => ({
     DeleteOTP: async (user) => {
         try {
             const qUser = 'delete from otp where id = $1'
-            await db.Pool.query(qUser, user)
+            await db.Pool.query(qUser, [user])
         } catch (error) {
             throw InternalServerError(error)
         }
