@@ -3,7 +3,7 @@ import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
 import { LoginSchema, OTPSchema, RegisterSchema, UserFindByEmaildSchema } from "../validator/UserSchema.js"
 import { sign } from '../utils/jwt.js';
 import { resClearCookie } from "../utils/response.js";
-import { SendEmailResetPassword } from '../utils/email.js';
+import { SendEmailRegister, SendEmailResetPassword } from '../utils/email.js';
 import generateOTP from "../utils/otp.js";
 
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
@@ -15,6 +15,8 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         validator.check(isValid)
         const result = await AuthRepository.FindByEmail(user.email)
         if (!result) throw NotFoundError('email tidak ditemukan atau belum terdaftar')
+        if (!result.verified_at) throw BadRequestError('email belum terverifikasi');
+
         await CheckPassword(user.password, result.password)
         const token = await sign({ id: result.id, username: result.username })
         return token
@@ -32,6 +34,7 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
             const resultUser = await AuthRepository.Create(user)
             await UserRepository.Create(resultUser.id)
             await tx.COMMIT()
+            await this.SendOTP(user)
             return resultUser
         } catch (error) {
             await tx.ROLLBACK()
@@ -61,8 +64,13 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
 
         const resultCreateOTP = await AuthRepository.CreateOTP(user)
 
-        await SendEmailResetPassword(user.email, resultCreateOTP.otp_code)
-        return 'please check your email'
+        if (user.otpstatus == 'forgotpassword') {
+            await SendEmailResetPassword(user.email, resultCreateOTP.otp_code)
+            return 'please check your email'
+        } else if (user.otpstatus = 'verify') {
+            await SendEmailRegister(user.email, resultCreateOTP.otp_code)
+            return 'please check your email'
+        }
     },
     async VerifOTP(user) {
         const isValid = validator.validate(user, OTPSchema)
@@ -73,6 +81,7 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
 
         const FindOTP = await AuthRepository.FindOTP(FindByEmail.id)
         if (!FindOTP) throw NotFoundError('please request resend otp')
+
         user.user_id = FindByEmail.id
         user.otp_id = FindOTP.id
 
@@ -111,7 +120,7 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         const tx = db.transaction(client)
         try {
             tx.BEGIN()
-            await UserRepository.Update({ id: user.user_id, is_verified: true })
+            await AuthRepository.UpdateVerified(user.user_id)
             await AuthRepository.DeleteOTP(user.otp_id)
             tx.COMMIT()
             return 'registration success'

@@ -69,6 +69,14 @@ export const AuthRepository = (db) => ({
         } catch (error) {
             throw InternalServerError(error)
         }
+    },
+    UpdateVerified: async (user) => {
+        try {
+            const qUser = 'update users set verified_at = now() where id = $1'
+            await db.Pool.query(qUser, [user])
+        } catch (error) {
+            throw InternalServerError(error)
+        }
     }
 
 })

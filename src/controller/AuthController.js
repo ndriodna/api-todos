@@ -49,6 +49,14 @@ const AuthController = (AuthService) => ({
         } catch (error) {
             next(error)
         }
+    },
+    RegistrationVerify: async (req, res, next) => {
+        try {
+            const result = await AuthService.RegistrationVerify(req.body)
+            return response(res, 200, 'OK', result)
+        } catch (error) {
+            next(error)
+        }
     }
 })
 export default AuthController
