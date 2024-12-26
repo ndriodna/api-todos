@@ -30,13 +30,13 @@ const forgotPasswordTemplate = (userMail, otp) => {
     return emailTemplate(content)
 }
 
-const registerTemplate = (userMail, token) => {
+const registerTemplate = (userMail, otp) => {
     const content = `
      <h1 style="text-transform: capitalize; font-weight: 900;">verify your account</h1>
         <div >
             <h3>hey ${userMail}</h3>
             <p>please complete verify registation account below</p>
-            <div style="padding: 10px 4px 10px 4px; background-color: #88aaee; color: white; text-align: center; font-weight: bold; font-size: larger; border-radius: 12px;text-transform: capitalize;"><a href="http://localhost:5173/register/${token}"></a></div>
+            <div style="padding: 10px 4px 10px 4px; background-color: #88aaee; color: white; text-align: center; font-weight: bold; font-size: larger; border-radius: 12px;text-transform: capitalize;">${otp}</div>
         </div>
     `
     return emailTemplate(content)
@@ -83,6 +83,14 @@ async function SendEmailResetPassword(email, otp) {
     await sendMail(data)
 }
 
+async function SendEmailRegister(email, otp) {
+    const data = {
+        to: email,
+        subject: 'verify account',
+        html: registerTemplate(email, otp)
+    }
+    await sendMail(data)
+}
 
 
-export { SendEmailResetPassword } 
+export { SendEmailResetPassword, SendEmailRegister } 
