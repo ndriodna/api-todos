@@ -1,6 +1,6 @@
 import { BadRequestError, NotFoundError } from "../exception/error.js"
 import { CheckPassword, GeneratePassword } from "../utils/bcrypt.js"
-import { LoginSchema, OTPSchema, RegisterSchema, UserFindByEmaildSchema } from "../validator/UserSchema.js"
+import { ForgotPasswordSchema, LoginSchema, RegisterSchema, RegisterVerifySchema, UserFindByEmaildSchema } from "../validator/UserSchema.js"
 import { sign } from '../utils/jwt.js';
 import { resClearCookie } from "../utils/response.js";
 import { SendEmailRegister, SendEmailResetPassword } from '../utils/email.js';
@@ -14,8 +14,8 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         const isValid = validator.validate(user, LoginSchema)
         validator.check(isValid)
         const result = await AuthRepository.FindByEmail(user.email)
-        if (!result) throw NotFoundError('email tidak ditemukan atau belum terdaftar')
-        if (!result.verified_at) throw BadRequestError('email belum terverifikasi');
+        if (!result) throw NotFoundError('email not registered')
+        if (!result.verified_at) throw BadRequestError('email not verified');
 
         await CheckPassword(user.password, result.password)
         const token = await sign({ id: result.id, username: result.username })
@@ -73,7 +73,7 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         }
     },
     async VerifOTP(user) {
-        const isValid = validator.validate(user, OTPSchema)
+        const isValid = validator.validate(user, UserFindByEmaildSchema)
         validator.check(isValid)
 
         const FindByEmail = await AuthRepository.FindByEmail(user.email)
@@ -85,7 +85,7 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         user.user_id = FindByEmail.id
         user.otp_id = FindOTP.id
 
-        if (FindOTP.otp_code != user.otp) throw BadRequestError('invalid otp')
+        if (FindOTP.otp_code != user.otp) throw BadRequestError('otp expired')
 
         const currentD = Date.now()
         const otpDate = Date.parse(FindOTP.created_at)
@@ -96,18 +96,20 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         }
     },
     async ForgotPassword(user) {
-        await this.VerifOTP(user)
-        user.password = await GeneratePassword(user.password)
         const client = await db.Pool.connect()
         const tx = db.transaction(client)
+        await this.VerifOTP(user)
+        const isValid = validator.validate(user, ForgotPasswordSchema)
+        validator.check(isValid)
         try {
-            tx.BEGIN()
+            await tx.BEGIN()
+            user.password = await GeneratePassword(user.password)
             await AuthRepository.Update({ id: user.user_id, password: user.password })
             await AuthRepository.DeleteOTP(user.otp_id)
-            tx.COMMIT()
+            await tx.COMMIT()
             return 'password updated'
         } catch (error) {
-            tx.ROLLBACK()
+            await tx.ROLLBACK()
             throw error
         } finally {
             client.release()
@@ -115,17 +117,19 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
 
     },
     async RegistrationVerify(user) {
-        await this.VerifOTP(user)
         const client = await db.Pool.connect()
         const tx = db.transaction(client)
+        await this.VerifOTP(user)
+        const isValid = validator.validate(user, RegisterVerifySchema)
+        validator.check(isValid)
         try {
-            tx.BEGIN()
+            await tx.BEGIN()
             await AuthRepository.UpdateVerified(user.user_id)
             await AuthRepository.DeleteOTP(user.otp_id)
-            tx.COMMIT()
+            await tx.COMMIT()
             return 'registration success'
         } catch (error) {
-            tx.ROLLBACK()
+            await tx.ROLLBACK()
             throw error
         } finally {
             client.release()

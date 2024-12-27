@@ -23,8 +23,13 @@ export const LoginSchema = {
     password: { type: 'string', min: 8, messages: { stringMin: "password minimal 8 karakter" } }
 }
 
-export const OTPSchema = {
+export const ForgotPasswordSchema = {
     email: { type: 'email', messages: { email: 'format email tidak sesuai' } },
     otp: { type: 'number', min: 6, message: { otp: 'invalid otp' } },
     password: { type: 'string', min: 8, messages: { stringMin: "password minimal 8 karakter" } }
+}
+
+export const RegisterVerifySchema = {
+    email: { type: 'email', messages: { email: "format email tidak sesuai" } },
+    otp: { type: 'number', min: 6, message: { otp: 'invalid otp' } },
 }
