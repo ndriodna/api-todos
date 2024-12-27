@@ -3,25 +3,19 @@ import { InternalServerError, UnauthorizedError } from '../exception/error.js'
 
 const saltRounds = 10
 
-export const GeneratePassword = (password) => {
-    return new Promise((resolve, reject) => {
-        bcrypt.hash(password, saltRounds, (err, encrypted) => {
-            if (err) {
-                reject(InternalServerError(err))
-            }
-            resolve(encrypted)
-        })
-    })
+export const GeneratePassword = async (password) => {
+    try {
+        const encrypted = await bcrypt.hash(password, saltRounds)
+        return encrypted
+    } catch (error) {
+        throw InternalServerError(error)
+    }
 }
-export const CheckPassword = (password, encrypted) => {
-    return new Promise((resolve, reject) => {
-        bcrypt.compare(password, encrypted, (err, result) => {
-            if (err) {
-                reject(UnauthorizedError(err))
-            } else if (!result) {
-                reject(UnauthorizedError('password invalid'))
-            }
-            resolve(result)
-        })
-    })
+export const CheckPassword = async (password, encrypted) => {
+    try {
+        const isMatch = await bcrypt.compare(password, encrypted)
+        if (!isMatch) throw UnauthorizedError('password invalid')
+    } catch (error) {
+        throw error
+    }
 } 
