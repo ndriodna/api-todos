@@ -21,8 +21,9 @@ export const AuthRepository = (db) => ({
     },
     Create: async (user) => {
         try {
-            const qUser = 'insert into users(email,username,password) values ($1, $2, $3) returning id, email, username'
+            const qUser = 'insert into users(email,username,password) values ($1, $2, $3) on conflict (email) do nothing returning id, email, username'
             const resultUser = await db.Pool.query(qUser, [user.email, user.username, user.password])
+            if (resultUser.rowCount === 0) return null
             return { id: resultUser.rows[0].id, username: resultUser.rows[0].username }
         } catch (error) {
             throw InternalServerError(error)

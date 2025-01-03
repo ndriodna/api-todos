@@ -26,12 +26,11 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         const tx = db.transaction(client)
         const isValid = validator.validate(user, RegisterSchema)
         validator.check(isValid)
-        const isExist = await AuthRepository.FindByEmail(user.email)
-        if (isExist == user.email) throw BadRequestError('email sudah digunakan')
         try {
             await tx.BEGIN()
             user.password = await GeneratePassword(user.password)
             const resultUser = await AuthRepository.Create(user)
+            if (!resultUser) throw BadRequestError('email already exist')
             await UserRepository.Create(resultUser.id)
             await tx.COMMIT()
             await this.SendOTP(user)
