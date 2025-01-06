@@ -17,7 +17,7 @@ export function verif(token) {
     return new Promise((resolve, reject) => {
         jwt.verify(token, secretKey, (err, decoded) => {
             if (err) {
-                reject(UnauthorizedError('token invalid please re-login'))
+                reject(UnauthorizedError('session timeout please re-login'))
             }
             resolve(decoded)
         })
