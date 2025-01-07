@@ -14,7 +14,7 @@ export const GeneratePassword = async (password) => {
 export const CheckPassword = async (password, encrypted) => {
     try {
         const isMatch = await bcrypt.compare(password, encrypted)
-        if (!isMatch) throw UnauthorizedError('password invalid')
+        if (!isMatch) throw UnauthorizedError('email/password invalid')
     } catch (error) {
         throw error
     }

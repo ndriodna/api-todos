@@ -14,7 +14,7 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         const isValid = validator.validate(user, LoginSchema)
         validator.check(isValid)
         const result = await AuthRepository.FindByEmail(user.email)
-        if (!result) throw NotFoundError('email not registered')
+        if (!result) throw NotFoundError('email/password invalid')
         if (!result.verified_at) throw BadRequestError('email not verified');
 
         await CheckPassword(user.password, result.password)
@@ -32,8 +32,8 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
             const resultUser = await AuthRepository.Create(user)
             if (!resultUser) throw BadRequestError('email already exist')
             await UserRepository.Create(resultUser.id)
-            await tx.COMMIT()
             await this.SendOTP(user)
+            await tx.COMMIT()
             return resultUser
         } catch (error) {
             await tx.ROLLBACK()
