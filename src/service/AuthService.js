@@ -6,6 +6,7 @@ import { resClearCookie } from "../utils/response.js";
 import { SendEmailRegister, SendEmailResetPassword } from '../utils/email.js';
 import generateOTP from "../utils/otp.js";
 
+
 const AuthService = (AuthRepository, UserRepository, db, validator) => ({
     async Auth(user) {
         return user.token
@@ -20,6 +21,9 @@ const AuthService = (AuthRepository, UserRepository, db, validator) => ({
         await CheckPassword(user.password, result.password)
         const token = await sign({ id: result.id, username: result.username })
         return token
+    },
+    async LoginGoogle(user) {
+        console.log("user google token", user.id_token);
     },
     async Register(user) {
         const client = await db.Pool.connect()

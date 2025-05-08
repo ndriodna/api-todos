@@ -18,6 +18,15 @@ const AuthController = (AuthService) => ({
             next(error)
         }
     },
+    LoginGoogle: async (req, res, next) => {
+        try {
+            const result = await AuthService.LoginGoogle(req.body)
+            resCookie(res, result)
+            return response(res, 200, 'OK', result)
+        } catch (error) {
+            next(error)
+        }
+    },
     Register: async (req, res, next) => {
         try {
             const result = await AuthService.Register(req.body)
